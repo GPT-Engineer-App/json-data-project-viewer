@@ -17,13 +17,14 @@ const Index = () => {
 
   const getProjectIds = () => {
     if (!jsonData) return [];
-    return Object.keys(jsonData.data).map((key) => key.split("/")[1]);
+    const projectIds = new Set(Object.keys(jsonData.data).map((key) => key.split("/")[1]));
+    return Array.from(projectIds);
   };
 
-  const getProjectEdits = () => {
-    if (!selectedProject || !jsonData) return [];
+  const getProjectEdits = (projectId) => {
+    if (!projectId || !jsonData) return [];
 
-    const edits = Object.values(jsonData.data).filter((edit) => edit.id.startsWith(`projects/${selectedProject}/edits/`));
+    const edits = Object.values(jsonData.data).filter((edit) => edit.id.startsWith(`projects/${projectId}/edits/`));
 
     return edits.sort((a, b) => new Date(b.created_at.__time__) - new Date(a.created_at.__time__));
   };
@@ -71,7 +72,7 @@ const Index = () => {
             <Heading as="h2" size="md" mb={2}>
               Edits for Project: {selectedProject}
             </Heading>
-            {getProjectEdits().map((edit) => (
+            {getProjectEdits(selectedProject).map((edit) => (
               <Box key={edit.id} mb={8}>
                 <Text fontWeight="bold" mb={2}>
                   Edit ID: {edit.id.split("/")[3]}
